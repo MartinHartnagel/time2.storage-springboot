@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: time2.storage
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect 
+
+dbType: sqlite
+driverClassName: org.sqlite.JDBC
+url: jdbc:sqlite:memory:myDb?cache=shared
+username: sa
+password: sa
+allowedOrigins: https://time2.emphasize.de
+eventBaseUrl: https://time2.emphasize.de/
