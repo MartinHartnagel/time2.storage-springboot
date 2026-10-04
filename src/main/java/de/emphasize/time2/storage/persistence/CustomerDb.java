@@ -21,10 +21,14 @@ public abstract class CustomerDb {
 
   protected abstract void createDm() throws SQLException;
 
+  protected String formatSql(String sql) {
+    return sql;
+  }
+
   public boolean execute(String sql, Object... params) {
     try {
       Connection connection = getCustomerDb().getConnection();
-      PreparedStatement statement = connection.prepareStatement(sql);
+      PreparedStatement statement = connection.prepareStatement(formatSql(sql));
       for (int i = 0; i < params.length; i++) {
         statement.setObject(i + 1, params[i]);
       }
@@ -39,7 +43,7 @@ public abstract class CustomerDb {
   public List<Map<String, Object>> query(String sql, Object... params) {
     try {
       Connection connection = getCustomerDb().getConnection();
-      PreparedStatement statement = connection.prepareStatement(sql);
+      PreparedStatement statement = connection.prepareStatement(formatSql(sql));
       for (int i = 0; i < params.length; i++) {
         statement.setObject(i + 1, params[i]);
       }

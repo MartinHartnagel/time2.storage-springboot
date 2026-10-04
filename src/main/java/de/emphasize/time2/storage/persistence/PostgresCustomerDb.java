@@ -29,26 +29,30 @@ public final class PostgresCustomerDb extends CustomerDb {
     return customerDb;
   }
 
+  protected String formatSql(String sql) {
+    return sql.replaceAll("`", "\"");
+  }
+
   protected void createDm() throws SQLException {
     execute(
-        "CREATE TABLE IF NOT EXISTS "
+        "CREATE TABLE IF NOT EXISTS `"
             + getPrefix()
-            + "LAYOUT (time bigint NOT NULL UNIQUE, value text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL);");
+            + "LAYOUT` (time bigint NOT NULL UNIQUE, value text NOT NULL);");
     execute(
-        "CREATE TABLE IF NOT EXISTS "
+        "CREATE TABLE IF NOT EXISTS `"
             + getPrefix()
-            + "EVENT (time bigint NOT NULL UNIQUE, name varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL, color varchar(7) NOT NULL, end bigint);");
+            + "EVENT` (time bigint NOT NULL UNIQUE, name varchar(256) NOT NULL, color varchar(7) NOT NULL, `end` bigint);");
     execute(
-        "CREATE TABLE IF NOT EXISTS "
+        "CREATE TABLE IF NOT EXISTS `"
             + getPrefix()
-            + "INFO (time bigint NOT NULL UNIQUE, info text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL);");
+            + "INFO` (time bigint NOT NULL UNIQUE, info text NOT NULL);");
     execute(
-        "CREATE TABLE IF NOT EXISTS "
+        "CREATE TABLE IF NOT EXISTS `"
             + getPrefix()
-            + "INVOICE (`key` varchar(256) NOT NULL UNIQUE, `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL);");
+            + "INVOICE` (`key` varchar(256) NOT NULL UNIQUE, value text NOT NULL);");
     execute(
-        "CREATE TABLE IF NOT EXISTS "
+        "CREATE TABLE IF NOT EXISTS `"
             + getPrefix()
-            + "NOTE (`key` varchar(256) NOT NULL UNIQUE, `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL);");
+            + "NOTE` (`key` varchar(256) NOT NULL UNIQUE, value text NOT NULL);");
   }
 }

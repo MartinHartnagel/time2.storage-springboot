@@ -78,7 +78,6 @@ public final class Persistence {
           break;
         }
       case DbType.MYSQL:
-      case DbType.POSTGRES:
         {
           // Events
           var list =
@@ -91,6 +90,24 @@ public final class Persistence {
           var list2 =
               customerDb.query(
                   "SELECT DISTINCT DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(ROUND(`time` / 1000)), '+00:00', @@session.time_zone), '%Y-%m-%d') AS `day` FROM `"
+                      + customerDb.getPrefix()
+                      + "INFO` ORDER BY `day` ASC");
+          days.addAll(list2.stream().map(m -> (String) m.get("day")).toList());
+          break;
+        }
+      case DbType.POSTGRES:
+        {
+          // Events
+          var list =
+              customerDb.query(
+                  "SELECT DISTINCT TO_CHAR(TO_TIMESTAMP(ROUND(`time` / 1000)::DECIMAL)::DATE, 'YYYY-MM-DD') AS `day` FROM `"
+                      + customerDb.getPrefix()
+                      + "EVENT` ORDER BY `day` ASC");
+          days.addAll(list.stream().map(m -> (String) m.get("day")).toList());
+          // Infos
+          var list2 =
+              customerDb.query(
+                  "SELECT DISTINCT TO_CHAR(TO_TIMESTAMP(ROUND(`time` / 1000)::DECIMAL)::DATE, 'YYYY-MM-DD') AS `day` FROM `"
                       + customerDb.getPrefix()
                       + "INFO` ORDER BY `day` ASC");
           days.addAll(list2.stream().map(m -> (String) m.get("day")).toList());
@@ -162,11 +179,23 @@ public final class Persistence {
           return mapValuesToHash(list);
         }
       case DbType.MYSQL:
-      case DbType.POSTGRES:
         {
           var list =
               customerDb.query(
                   "SELECT `key`, SHA2(`value`, 256) as  `checksum` FROM `"
+                      + customerDb.getPrefix()
+                      + "INVOICE` WHERE `key` like 'invoice_%'");
+          Map<String, String> checksums = new HashMap<>();
+          for (Map<String, Object> row : list) {
+            checksums.put((String) row.get("key"), (String) row.get("checksum"));
+          }
+          return checksums;
+        }
+      case DbType.POSTGRES:
+        {
+          var list =
+              customerDb.query(
+                  "SELECT `key`, ENCODE(SHA256(CONVERT_TO(`value`, 'UTF8')), 'hex') as  `checksum` FROM `"
                       + customerDb.getPrefix()
                       + "INVOICE` WHERE `key` like 'invoice_%'");
           Map<String, String> checksums = new HashMap<>();
@@ -191,11 +220,23 @@ public final class Persistence {
           return mapValuesToHash(list);
         }
       case DbType.MYSQL:
-      case DbType.POSTGRES:
         {
           var list =
               customerDb.query(
                   "SELECT `key`, SHA2(`value`, 256) as  `checksum` FROM `"
+                      + customerDb.getPrefix()
+                      + "NOTE` WHERE `key` like 'note_%'");
+          Map<String, String> checksums = new HashMap<>();
+          for (Map<String, Object> row : list) {
+            checksums.put((String) row.get("key"), (String) row.get("checksum"));
+          }
+          return checksums;
+        }
+      case DbType.POSTGRES:
+        {
+          var list =
+              customerDb.query(
+                  "SELECT `key`, ENCODE(SHA256(CONVERT_TO(`value`, 'UTF8')), 'hex') as  `checksum` FROM `"
                       + customerDb.getPrefix()
                       + "NOTE` WHERE `key` like 'note_%'");
           Map<String, String> checksums = new HashMap<>();
@@ -338,12 +379,16 @@ public final class Persistence {
     storeInvoiceKeyValue(
         "invoice_" + invoiceNumber, objectMapper.writeValueAsString(extracted.get("invoice")));
     Map<String, String> twigs = (Map<String, String>) extracted.get("twigs");
-    for (String key : twigs.keySet()) {
-      storeInvoiceKeyValue(key, twigs.get(key));
+    if (twigs != null) {
+      for (String key : twigs.keySet()) {
+        storeInvoiceKeyValue(key, twigs.get(key));
+      }
     }
     Map<String, String> assets = (Map<String, String>) extracted.get("assets");
-    for (String key : assets.keySet()) {
-      storeInvoiceKeyValue(key, assets.get(key));
+    if (assets != null) {
+      for (String key : assets.keySet()) {
+        storeInvoiceKeyValue(key, assets.get(key));
+      }
     }
   }
 

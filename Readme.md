@@ -28,7 +28,7 @@ mvn spring-boot:run -Dspring-boot.run.jvmArguments="-DdbType=mysql -DdriverClass
 
 An example to override parameters running with java directly:
 ```
-java -jar target/time2.storage-0.0.1-SNAPSHOT.jar --DdbType=mysql --DdriverClassName=com.mysql.cj.jdbc.Driver --Durl=jdbc:mysql://127.0.0.1:3307/mysql --Dusername=some_user --Dpassword=some_password
+java -jar target/time2.storage-0.0.1-SNAPSHOT.jar --DdbType=postgres --DdriverClassName=org.postgresql.Driver --Durl=jdbc:postgresql://127.0.0.1:5432/db -Dusername=some_user -Dpassword=some_password
 ```
 
 
