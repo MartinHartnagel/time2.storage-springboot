@@ -21,6 +21,17 @@ The following databases are supported:
 
 The datasource can be configured in src/main/resources/application.yaml or by overriding with parameters when executing. 
 
+An example to override parameters running with maven:
+```
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-DdbType=mysql -DdriverClassName=com.mysql.cj.jdbc.Driver -Durl=jdbc:mysql://127.0.0.1:3307/mysql -Dusername=some_user -Dpassword=some_password"
+```
+
+An example to override parameters running with java directly:
+```
+java -jar target/time2.storage-0.0.1-SNAPSHOT.jar --DdbType=mysql --DdriverClassName=com.mysql.cj.jdbc.Driver --Durl=jdbc:mysql://127.0.0.1:3307/mysql --Dusername=some_user --Dpassword=some_password
+```
+
+
 ## Run
 
 ```

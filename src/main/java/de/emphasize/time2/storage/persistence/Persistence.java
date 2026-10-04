@@ -68,12 +68,12 @@ public final class Persistence {
           // Events
           var list =
               customerDb.query(
-                  "SELECT DISTINCT DATE(ROUND(`time` / 1000), 'unixepoch', 'localtime') AS `day` FROM `EVENT` ORDER BY `time` ASC");
+                  "SELECT DISTINCT DATE(ROUND(`time` / 1000), 'unixepoch', 'localtime') AS `day` FROM `EVENT` ORDER BY `day` ASC");
           days.addAll(list.stream().map(m -> (String) m.get("day")).toList());
           // Infos
           var list2 =
               customerDb.query(
-                  "SELECT DISTINCT DATE(ROUND(`time` / 1000), 'unixepoch', 'localtime') AS `day` FROM `INFO` ORDER BY `time` ASC");
+                  "SELECT DISTINCT DATE(ROUND(`time` / 1000), 'unixepoch', 'localtime') AS `day` FROM `INFO` ORDER BY `day` ASC");
           days.addAll(list2.stream().map(m -> (String) m.get("day")).toList());
           break;
         }
@@ -85,14 +85,14 @@ public final class Persistence {
               customerDb.query(
                   "SELECT DISTINCT DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(ROUND(`time` / 1000)), '+00:00', @@session.time_zone), '%Y-%m-%d') AS `day` FROM `"
                       + customerDb.getPrefix()
-                      + "EVENT` ORDER BY `time` ASC");
+                      + "EVENT` ORDER BY `day` ASC");
           days.addAll(list.stream().map(m -> (String) m.get("day")).toList());
           // Infos
           var list2 =
               customerDb.query(
                   "SELECT DISTINCT DATE_FORMAT(CONVERT_TZ(FROM_UNIXTIME(ROUND(`time` / 1000)), '+00:00', @@session.time_zone), '%Y-%m-%d') AS `day` FROM `"
                       + customerDb.getPrefix()
-                      + "INFO` ORDER BY `time` ASC");
+                      + "INFO` ORDER BY `day` ASC");
           days.addAll(list2.stream().map(m -> (String) m.get("day")).toList());
           break;
         }

@@ -5,8 +5,14 @@ spring:
     database-platform: org.hibernate.community.dialect.SQLiteDialect 
 
 dbType: sqlite
+#dbType: mysql
+#dbType: postgres
 driverClassName: org.sqlite.JDBC
+#driverClassName: com.mysql.cj.jdbc.Driver
+#driverClassName: org.postgresql.Driver
 url: jdbc:sqlite:memory:myDb?cache=shared
+#url: jdbc:mysql://localhost:3306/testdb
+#url: jdbc:postgresql://localhost:5432/testdb
 username: sa
 password: sa
 allowedOrigins: https://time2.emphasize.de

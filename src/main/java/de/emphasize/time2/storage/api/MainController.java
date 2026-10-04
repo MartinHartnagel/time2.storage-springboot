@@ -130,7 +130,7 @@ public class MainController {
       checksums.putAll(db.loadInvoiceChecksums());
       checksums.putAll(db.loadNoteChecksums());
 
-      if (layoutAndChanged != null) {
+      if (layoutAndChanged != null && layoutAndChanged.get("changed") != null) {
         checksums.put("layout-changed", Long.toString((Long) layoutAndChanged.get("changed")));
         checksums.put("layout", Hasher.create().hash((String) layoutAndChanged.get("layout")));
       }
