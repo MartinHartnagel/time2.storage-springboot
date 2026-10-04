@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import tools.jackson.databind.ObjectMapper;
 
@@ -30,6 +31,8 @@ public final class Persistence {
   }
 
   public List<Map<String, Object>> loadEvents(Long from, Long to) {
+    Optional.ofNullable(from).orElseThrow(RuntimeException::new);
+    Optional.ofNullable(to).orElseThrow(RuntimeException::new);
     return customerDb.query(
         "SELECT `time` as s, `name` as n, `color` as c, `end` as e FROM `"
             + customerDb.getPrefix()
@@ -39,6 +42,8 @@ public final class Persistence {
   }
 
   public List<Map<String, Object>> loadInfos(Long from, Long to) {
+    Optional.ofNullable(from).orElseThrow(RuntimeException::new);
+    Optional.ofNullable(to).orElseThrow(RuntimeException::new);
     return customerDb.query(
         "SELECT `time` as s, `info` as i FROM `"
             + customerDb.getPrefix()
@@ -48,6 +53,7 @@ public final class Persistence {
   }
 
   public Map<String, Object> loadLayoutAndChanged(Long at) {
+    Optional.ofNullable(at).orElseThrow(RuntimeException::new);
     var result =
         customerDb.query(
             "SELECT `value` as layout, `time` as changed FROM `"
@@ -119,6 +125,7 @@ public final class Persistence {
   }
 
   public String loadNote(String id) {
+    Optional.ofNullable(id).orElseThrow(RuntimeException::new);
     String key = "note_" + id;
     var result =
         customerDb.query(
@@ -130,12 +137,15 @@ public final class Persistence {
   }
 
   public boolean deleteNote(String id) {
+    Optional.ofNullable(id).orElseThrow(RuntimeException::new);
     String key = "note_" + id;
     return customerDb.execute(
         "DELETE FROM `" + customerDb.getPrefix() + "NOTE` WHERE `key` = ?", key);
   }
 
   public boolean storeNote(String id, String json) {
+    Optional.ofNullable(id).orElseThrow(RuntimeException::new);
+    Optional.ofNullable(json).orElseThrow(RuntimeException::new);
     deleteNote(id);
     String key = "note_" + id;
     return customerDb.execute(
@@ -145,6 +155,11 @@ public final class Persistence {
   }
 
   public void storeEvent(Long time, String name, String color, Long end) {
+    Optional.ofNullable(time).orElseThrow(RuntimeException::new);
+    Optional.ofNullable(name).orElseThrow(RuntimeException::new);
+    Optional.of(name).filter(v -> v.trim().length() > 0).orElseThrow(RuntimeException::new);
+    Optional.ofNullable(color).orElseThrow(RuntimeException::new);
+    Optional.of(color).filter(v -> v.trim().length() > 0).orElseThrow(RuntimeException::new);
     customerDb.execute("DELETE FROM `" + customerDb.getPrefix() + "EVENT` WHERE `time` = ?", time);
 
     customerDb.execute(
@@ -195,7 +210,7 @@ public final class Persistence {
         {
           var list =
               customerDb.query(
-                  "SELECT `key`, ENCODE(SHA256(CONVERT_TO(`value`, 'UTF8')), 'hex') as  `checksum` FROM `"
+                  "SELECT `key`, ENCODE(SHA256(CONVERT_TO(`value`, 'UTF8')), 'hex') as `checksum` FROM `"
                       + customerDb.getPrefix()
                       + "INVOICE` WHERE `key` like 'invoice_%'");
           Map<String, String> checksums = new HashMap<>();
@@ -236,7 +251,7 @@ public final class Persistence {
         {
           var list =
               customerDb.query(
-                  "SELECT `key`, ENCODE(SHA256(CONVERT_TO(`value`, 'UTF8')), 'hex') as  `checksum` FROM `"
+                  "SELECT `key`, ENCODE(SHA256(CONVERT_TO(`value`, 'UTF8')), 'hex') as `checksum` FROM `"
                       + customerDb.getPrefix()
                       + "NOTE` WHERE `key` like 'note_%'");
           Map<String, String> checksums = new HashMap<>();
@@ -250,6 +265,7 @@ public final class Persistence {
   }
 
   private Map<String, String> mapValuesToHash(List<Map<String, Object>> list) {
+    Optional.ofNullable(list).orElseThrow(RuntimeException::new);
     Map<String, String> checksums = new HashMap<>();
     Hasher hasher = Hasher.create();
     for (Map<String, Object> row : list) {
@@ -259,6 +275,8 @@ public final class Persistence {
   }
 
   public String loadEventsOnDay(String day) {
+    Optional.ofNullable(day).orElseThrow(RuntimeException::new);
+    Optional.of(day).filter(v -> v.length() == 10).orElseThrow(RuntimeException::new);
     long from;
     long to;
     try {
@@ -323,6 +341,7 @@ public final class Persistence {
   }
 
   public Map<String, String> loadEventChecksums(List<String> days) {
+    Optional.ofNullable(days).orElseThrow(RuntimeException::new);
     Map<String, String> checksums = new HashMap<>();
     Hasher hasher = Hasher.create();
     for (String day : days) {
@@ -366,15 +385,19 @@ public final class Persistence {
   }
 
   public void deleteInvoice(String invoiceNumber) {
+    Optional.ofNullable(invoiceNumber).orElseThrow(RuntimeException::new);
     String key = "invoice_" + invoiceNumber;
     deleteInvoiceKeyValue(key);
   }
 
   private void deleteInvoiceKeyValue(String key) {
+    Optional.ofNullable(key).orElseThrow(RuntimeException::new);
     customerDb.execute("DELETE FROM `" + customerDb.getPrefix() + "INVOICE` WHERE `key` = ?", key);
   }
 
   public void storeInvoice(String invoiceNumber, Map<String, Object> extracted) {
+    Optional.ofNullable(invoiceNumber).orElseThrow(RuntimeException::new);
+    Optional.ofNullable(extracted).orElseThrow(RuntimeException::new);
     ObjectMapper objectMapper = new ObjectMapper();
     storeInvoiceKeyValue(
         "invoice_" + invoiceNumber, objectMapper.writeValueAsString(extracted.get("invoice")));
@@ -393,6 +416,8 @@ public final class Persistence {
   }
 
   private void storeInvoiceKeyValue(String key, String value) {
+    Optional.ofNullable(key).orElseThrow(RuntimeException::new);
+    Optional.ofNullable(value).orElseThrow(RuntimeException::new);
     deleteInvoiceKeyValue(key);
     customerDb.execute(
         "INSERT INTO `" + customerDb.getPrefix() + "INVOICE` (`key`, `value`) VALUES (?, ?)",
@@ -401,6 +426,7 @@ public final class Persistence {
   }
 
   public String loadInvoiceValue(String key) {
+    Optional.ofNullable(key).orElseThrow(RuntimeException::new);
     var result =
         customerDb.query(
             "SELECT `value` FROM `" + customerDb.getPrefix() + "INVOICE` WHERE `key` = ?", key);
@@ -419,6 +445,8 @@ public final class Persistence {
   }
 
   public void storeInfo(Long time, String info) {
+    Optional.ofNullable(time).orElseThrow(RuntimeException::new);
+    Optional.ofNullable(info).orElseThrow(RuntimeException::new);
     customerDb.execute("DELETE FROM `" + customerDb.getPrefix() + "INFO` WHERE `time` = ?", time);
     customerDb.execute(
         "INSERT INTO `" + customerDb.getPrefix() + "INFO` (`time`, `info`) VALUES (?, ?)",
@@ -427,6 +455,9 @@ public final class Persistence {
   }
 
   public void storeLayout(Long at, String value) {
+    Optional.ofNullable(at).orElseThrow(RuntimeException::new);
+    Optional.ofNullable(value).orElseThrow(RuntimeException::new);
+    Optional.of(value).filter(v -> v.trim().length() > 0).orElseThrow(RuntimeException::new);
     customerDb.execute("DELETE FROM `" + customerDb.getPrefix() + "LAYOUT` WHERE `time` = ?", at);
     customerDb.execute(
         "INSERT INTO `" + customerDb.getPrefix() + "LAYOUT` (`time`, `value`) VALUES (?, ?)",
